@@ -1,15 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import CourseCard from "@/components/CourseCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter } from "lucide-react";
+import { fetchCourses } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Demo courses data
-  const courses = [
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
+    try {
+      const data = await fetchCourses();
+      setCourses(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load courses. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Courses data from API
+  const coursesData = [
     {
       id: 1,
       title: "React Fundamentals",
